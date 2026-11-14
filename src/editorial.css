@@ -747,6 +747,12 @@ textarea {
   background: #faf9f4;
 }
 
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+}
+
 .form-config-note--top {
   grid-column: 1 / -1;
   margin: 0 0 3px;

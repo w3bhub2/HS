@@ -2112,12 +2112,14 @@ function NotFoundPage() {
     >
       <section className="content-section section-pad">
         <div className="container narrow-container">
-          <AppLink to="/treatments/" className="text-link">
-            Explore treatment areas <ArrowIcon />
-          </AppLink>
-          <AppLink to="/contact/" className="text-link">
-            Contact HealSpoc <ArrowIcon />
-          </AppLink>
+          <div className="not-found-actions">
+            <AppLink to="/treatments/" className="text-link">
+              Explore treatment areas <ArrowIcon />
+            </AppLink>
+            <AppLink to="/contact/" className="text-link">
+              Contact HealSpoc <ArrowIcon />
+            </AppLink>
+          </div>
         </div>
       </section>
     </PageFrame>

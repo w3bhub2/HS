@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { createServer } from "vite";
@@ -220,4 +220,10 @@ await writeFile(
 );
 
 await syncCspHashes(root);
+await Promise.all(
+  [".htaccess", "_headers", "_redirects"].map((name) =>
+    rm(resolve(dist, name), { force: true }),
+  ),
+);
+await writeFile(resolve(dist, ".nojekyll"), "");
 console.log(`Prepared ${routes.length} prerendered routes, a real 404 page, and shared external assets.`);

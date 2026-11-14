@@ -51,4 +51,4 @@ Content is maintained in typed source files. A CMS was not added because access 
 - Verify current hospital/provider relationships and supply an appropriately qualified medical reviewer for clinical content.
 - Create a Web3Forms access key for `hello@healspoc.com`, restrict allowed domains, build with the key, and complete a real inbox delivery test. No key or inbox access was available in this project.
 - Provide analytics property IDs and consent/privacy requirements if analytics are required. Events are instrumented as an integration seam only; no external analytics service is configured.
-- Stage, deploy, verify HTTPS/security headers, and keep a tested rollback artifact. Deployment has not occurred.
+- GitHub Pages was published at `https://w3bhub2.github.io/HS/` and its HTTPS routes were checked. No migration of `healspoc.com`, live WordPress backup, or WordPress rollback has occurred. GitHub Pages does not apply the supplied Apache/Netlify rules or permit custom response security headers.

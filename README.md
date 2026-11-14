@@ -20,6 +20,7 @@ GitHub Actions builds and deploys the site on pushes to `main` using `.github/wo
 `npm run build` is the required Vite compile step, not the complete Pages artifact. Run `scripts/prepare-static-site.mjs` after it. The preparer extracts the configured single-file bundle into shared external assets, prerenders routes, and adds a browser-enforced CSP meta tag. `scripts/sync-csp-hashes.mjs` updates optional Apache/Netlify host policies; GitHub Pages ignores `.htaccess`, `_headers`, and `_redirects`. It cannot serve real HTTP 301 redirects or custom security response headers for this project site.
 
 `node scripts/browser-audit.mjs` uses Playwright and axe-core against a local server serving `dist` from `/HS/`; it is a local QA step, not a substitute for real-device or production tests.
+`node scripts/form-mock-audit.mjs` starts a temporary development server with a dummy key and exercises success, error, honeypot, phone normalization, and analytics paths using mocked API responses. It does not send an email.
 
 ## Contact and form setup
 

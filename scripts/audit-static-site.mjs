@@ -118,6 +118,10 @@ const notFound = readFileSync(join(dist, "404.html"), "utf8");
 assert(notFound.includes("noindex,follow"), "The 404 page is not marked noindex.");
 assert(!/rel="canonical"/.test(notFound), "The 404 page unexpectedly declares a canonical URL.");
 assert(readFileSync(join(dist, "robots.txt"), "utf8").includes(`${siteUrl}/sitemap.xml`), "Robots sitemap URL is incorrect.");
+assert(existsSync(join(dist, ".nojekyll")), "GitHub Pages .nojekyll marker is missing.");
+assert(!existsSync(join(dist, ".htaccess")), "Apache rules must not be included in the Pages artifact.");
+assert(!existsSync(join(dist, "_headers")), "Unsupported response-header rules must not be included in the Pages artifact.");
+assert(!existsSync(join(dist, "_redirects")), "Unsupported redirect rules must not be included in the Pages artifact.");
 
 if (problems.length) {
   console.error(`Static audit failed with ${problems.length} issue(s):`);

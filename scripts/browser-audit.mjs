@@ -182,5 +182,5 @@ if (problems.length) {
   process.exitCode = 1;
 } else {
   console.log(`Browser audit passed: ${pagesChecked} route/screen combinations, mobile menu, WhatsApp messaging/events, offline form states, and four automated WCAG scans.`);
-  console.log("Real device testing, Web3Forms delivery, and deployed site checks still require separate verification.");
+  console.log("Real iOS/Android devices, Web3Forms inbox delivery, and live WhatsApp app handoff still require separate verification.");
 }

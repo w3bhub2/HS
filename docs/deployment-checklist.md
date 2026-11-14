@@ -1,6 +1,6 @@
 # Production Deployment Checklist
 
-This project has not been deployed. Use this checklist only after the owner authorizes the migration.
+The rebuilt site is deployed at <https://w3bhub2.github.io/HS/> without a custom domain. The checklist below applies to any future migration of `healspoc.com`, which has not been changed. The GitHub Pages build is public, but that alone does not verify the old WordPress installation or the outstanding owner-controlled services.
 
 ## Before changing the live site
 
