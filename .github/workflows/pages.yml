@@ -1,0 +1,65 @@
+name: Build and deploy HealSpoc
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Type-check
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build -- --base /HS/
+        env:
+          VITE_BASE_PATH: /HS/
+          VITE_SITE_URL: https://w3bhub2.github.io/HS
+          VITE_WEB3FORMS_ACCESS_KEY: ${{ secrets.WEB3FORMS_ACCESS_KEY }}
+      - name: Prerender routes and metadata
+        run: node scripts/prepare-static-site.mjs
+        env:
+          VITE_BASE_PATH: /HS/
+          VITE_SITE_URL: https://w3bhub2.github.io/HS
+          VITE_WEB3FORMS_ACCESS_KEY: ${{ secrets.WEB3FORMS_ACCESS_KEY }}
+      - name: Validate static output
+        run: node scripts/audit-static-site.mjs
+        env:
+          VITE_BASE_PATH: /HS/
+          VITE_SITE_URL: https://w3bhub2.github.io/HS
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publish.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: publish
+        uses: actions/deploy-pages@v4
