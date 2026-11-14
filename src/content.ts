@@ -103,8 +103,8 @@ export const publicSources: SourceLink[] = [
   },
   {
     label: "WHO: International travel and health",
-    url: "https://iris.who.int/server/api/core/bitstreams/dd53602a-029a-4d1a-8e43-b26428324e1f/content",
-    note: "WHO travel-health guidance; advice should be discussed with a clinician where relevant.",
+    url: "https://www.who.int/publications/i/item/9789240093584",
+    note: "WHO Module 1 on general travel-health considerations; discuss individual concerns with a clinician.",
   },
   {
     label: "ICMR: Standard Treatment Workflows",
