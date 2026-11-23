@@ -64,6 +64,22 @@ for (const url of routes) {
   assert(Boolean(meta(html, "name", "description")), `${path}: missing meta description.`);
   assert(attribute(canonical || "", "href") === url, `${path}: incorrect canonical URL.`);
   assert(attribute(meta(html, "property", "og:url") || "", "content") === url, `${path}: incorrect Open Graph URL.`);
+  const ogImage = attribute(meta(html, "property", "og:image") || "", "content");
+  const ogFile = ogImage ? localFile(new URL(ogImage).pathname) : null;
+  assert(Boolean(ogFile && existsSync(ogFile)), `${path}: missing Open Graph image ${ogImage}.`);
+  const careSlug = path.match(/^\/treatments\/([^/]+)\/$/)?.[1];
+  if (careSlug) {
+    assert(
+      ogImage === `${siteUrl}/images/treatments/${careSlug}.jpg`,
+      `${path}: Open Graph image does not match this treatment area.`,
+    );
+  }
+  if (path === "/medical-travel-to-india/") {
+    assert(
+      ogImage === `${siteUrl}/images/treatments/medical-travel.jpg`,
+      `${path}: medical travel Open Graph image is not travel-related.`,
+    );
+  }
   assert(Boolean(meta(html, "http-equiv", "Content-Security-Policy")), `${path}: missing CSP meta tag.`);
   assert(!/lorem ipsum|40K Reviews|guaranteed savings|Dr\. Jennifer Scott/i.test(html), `${path}: prohibited placeholder or unsupported claim found.`);
   assert(!/961\s*102\s*7762|951\s*335\s*7762/.test(html), `${path}: superseded phone number found.`);

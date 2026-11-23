@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { trackEvent } from "./analytics";
+import { HealSpocMark, WhatsAppIcon } from "./brand";
 import {
   OFFICIAL_EMAIL,
   SITE_BASE_PATH,
@@ -15,12 +16,14 @@ import {
   WHATSAPP_URL,
   faqs,
   legacyRedirects,
+  medicalTravelVisual,
   navigation,
   publicSources,
   assetPath,
   routePath,
   treatmentAreas,
   type SourceLink,
+  type PageVisual,
   type TreatmentArea,
 } from "./content";
 
@@ -225,30 +228,6 @@ function ShieldIcon() {
   );
 }
 
-function MessageIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-      <path d="M20.5 11.5a8.5 8.5 0 0 1-12.8 7.3L3.5 20l1.2-4a8.5 8.5 0 1 1 15.8-4.5Z" />
-      <path d="M8.6 9.3c.3 2.2 2 3.9 4.2 4.3" />
-    </svg>
-  );
-}
-
-function LogoMark({ inverse = false }: { inverse?: boolean }) {
-  return (
-    <svg
-      className={`brand-mark${inverse ? " brand-mark--inverse" : ""}`}
-      aria-hidden="true"
-      viewBox="0 0 40 40"
-      fill="none"
-    >
-      <path d="M9 5v30M31 5v30M9 20h22" />
-      <path d="M3 5h12M25 35h12" />
-      <circle cx="31" cy="20" r="2.5" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 function Brand({ light = false }: { light?: boolean }) {
   return (
     <AppLink
@@ -256,7 +235,7 @@ function Brand({ light = false }: { light?: boolean }) {
       className={`brand${light ? " brand--light" : ""}`}
       aria-label="HealSpoc home"
     >
-      <LogoMark inverse={light} />
+      <HealSpocMark />
       <span className="brand__wordmark">Heal<span>Spoc</span></span>
     </AppLink>
   );
@@ -300,7 +279,7 @@ function WhatsAppAction({
         }
       }}
     >
-      <MessageIcon />
+      <WhatsAppIcon />
       <span>{children ?? label}</span>
       <ArrowIcon diagonal />
     </a>
@@ -438,17 +417,36 @@ function PageFrame({
   eyebrow,
   description,
   breadcrumbs,
+  visual,
   children,
 }: {
   title: string;
   eyebrow: string;
   description: string;
   breadcrumbs: BreadcrumbItem[];
+  visual?: PageVisual;
   children: ReactNode;
 }) {
   return (
     <>
-      <section className="page-hero">
+      <section className={`page-hero${visual ? " page-hero--visual" : ""}`}>
+        {visual && (
+          <>
+            <picture className="page-hero__media">
+              <source
+                srcSet={assetPath(`images/${visual.file}.webp`)}
+                type="image/webp"
+              />
+              <img
+                src={assetPath(`images/${visual.file}.jpg`)}
+                alt={visual.alt}
+                fetchPriority="high"
+                decoding="async"
+              />
+            </picture>
+            <div className="page-hero__veil" aria-hidden="true" />
+          </>
+        )}
         <div className="container page-hero__inner">
           <Breadcrumbs items={breadcrumbs} />
           <div className="page-hero__copy">
@@ -458,6 +456,7 @@ function PageFrame({
           </div>
         </div>
       </section>
+      {visual && <p className="hero-image-disclosure">{visual.caption}</p>}
       {children}
     </>
   );
@@ -919,6 +918,7 @@ function TreatmentPage({ area }: { area: TreatmentArea }) {
       title={area.label}
       eyebrow="Treatment enquiry category"
       description={area.summary}
+      visual={area.visual}
       breadcrumbs={[
         { label: "Treatments", to: "/treatments/" },
         { label: area.label },
@@ -1256,6 +1256,7 @@ function MedicalTravelPage() {
       title="Medical travel to India"
       eyebrow="Plan with reliable information"
       description="Explore the questions that matter before crossing a border for care. No country, provider, treatment, or outcome is right for everyone."
+      visual={medicalTravelVisual}
       breadcrumbs={[{ label: "Medical travel to India" }]}
     >
       <section className="content-section section-pad">
@@ -1842,11 +1843,13 @@ function EnquiryForm() {
 }
 
 function ContactPage() {
+  const formAvailable = Boolean(import.meta.env.VITE_WEB3FORMS_ACCESS_KEY?.trim());
+
   return (
     <PageFrame
       title="Talk to the HealSpoc team"
       eyebrow="Contact"
-      description="WhatsApp is the primary way to start a conversation. A short web form is available as a secondary option when delivery is configured."
+      description="WhatsApp is the primary way to start a conversation. Email is also available; the short web form appears only when delivery is configured."
       breadcrumbs={[{ label: "Contact" }]}
     >
       <section className="content-section section-pad">
@@ -1882,16 +1885,29 @@ function ContactPage() {
               healthcare provider.
             </p>
           </div>
-          <div className="contact-form-panel">
+          <div className={`contact-form-panel${formAvailable ? "" : " contact-form-panel--offline"}`}>
             <div className="contact-form-panel__intro">
               <p className="eyebrow">Secondary contact</p>
-              <h2>Send a short enquiry.</h2>
-              <p>
-                The form asks only for contact and enquiry details. It is not a
-                secure channel for medical records.
-              </p>
+              <h2>{formAvailable ? "Send a short enquiry." : "Prefer to write?"}</h2>
+              {formAvailable ? (
+                <p>
+                  The form asks only for contact and enquiry details. It is not a
+                  secure channel for medical records.
+                </p>
+              ) : (
+                <p>
+                  The web enquiry form is not active yet. Email a general
+                  question instead, without attaching sensitive medical records.
+                </p>
+              )}
             </div>
-            <EnquiryForm />
+            {formAvailable ? (
+              <EnquiryForm />
+            ) : (
+              <a className="button button--primary contact-email-cta" href={`mailto:${OFFICIAL_EMAIL}`}>
+                Email {OFFICIAL_EMAIL} <ArrowIcon diagonal />
+              </a>
+            )}
           </div>
         </div>
       </section>
@@ -2205,7 +2221,7 @@ function WhatsAppWidget({ currentPath }: { currentPath: string }) {
             ))}
           </ul>
           <div className="whatsapp-panel__footer">
-            <MessageIcon />
+            <WhatsAppIcon />
             <span>{WHATSAPP_DISPLAY}</span>
           </div>
       </section>
@@ -2217,7 +2233,7 @@ function WhatsAppWidget({ currentPath }: { currentPath: string }) {
         aria-controls="whatsapp-widget-options"
         onClick={toggleWidget}
       >
-        <MessageIcon />
+        <WhatsAppIcon />
       </button>
       <a
         className="mobile-whatsapp-cta"
@@ -2233,7 +2249,7 @@ function WhatsAppWidget({ currentPath }: { currentPath: string }) {
           })
         }
       >
-        <MessageIcon />
+        <WhatsAppIcon />
         <span>Chat on WhatsApp</span>
         <ArrowIcon diagonal />
       </a>
@@ -2271,7 +2287,10 @@ function updateHead(path: string, metadata: PageMetadata, isKnownPage: boolean) 
     'meta[property="og:image"]',
     "property",
     "og:image",
-    `${SITE_URL}/images/hero-care.jpg`,
+    `${SITE_URL}/images/${
+      treatmentAreas.find((area) => path === `/treatments/${area.slug}/`)?.visual.file ??
+      (path === "/medical-travel-to-india/" ? medicalTravelVisual.file : "hero-care")
+    }.jpg`,
   );
   updateMeta(
     'meta[name="twitter:card"]',

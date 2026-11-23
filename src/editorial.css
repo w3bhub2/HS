@@ -115,14 +115,37 @@ textarea {
 }
 
 .brand-mark {
-  width: 37px;
-  height: 37px;
-  color: #dabd88;
-  stroke-width: 2;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  stroke: none;
 }
 
-.brand-mark--inverse {
-  color: #dabd88;
+.brand-mark__h {
+  fill: none;
+  stroke: #dce9df;
+  stroke-width: 3.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-mark__s {
+  fill: none;
+  stroke: #d9b97d;
+  stroke-width: 3.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-mark__dot {
+  fill: #d9b97d;
+  stroke: none;
+}
+
+.whatsapp-logo,
+.whatsapp-logo path {
+  fill: currentColor;
+  stroke: none;
 }
 
 .primary-navigation {
@@ -722,6 +745,70 @@ textarea {
   background: #e4eee5;
 }
 
+.page-hero--visual {
+  position: relative;
+  display: flex;
+  min-height: 550px;
+  align-items: center;
+  overflow: hidden;
+  color: #f4f7ed;
+  background: #0b282d;
+  isolation: isolate;
+}
+
+.page-hero__media {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.page-hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 45%;
+  filter: saturate(0.85) brightness(0.9);
+}
+
+.page-hero__veil {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(7, 30, 35, 0.96), rgba(7, 30, 35, 0.86) 41%, rgba(7, 30, 35, 0.28)),
+    linear-gradient(0deg, rgba(7, 30, 35, 0.25), transparent 70%);
+}
+
+.page-hero--visual .page-hero__inner {
+  position: relative;
+  z-index: 1;
+}
+
+.page-hero--visual .page-hero__copy {
+  max-width: 730px;
+}
+
+.page-hero--visual h1 {
+  color: #f7f8ef;
+}
+
+.page-hero--visual .page-hero__description {
+  max-width: 570px;
+  color: #deebe3;
+}
+
+.page-hero--visual .eyebrow {
+  color: #e6c99b;
+}
+
+.page-hero--visual .breadcrumbs ol,
+.page-hero--visual .breadcrumbs li + li::before {
+  color: #e0ebe3;
+}
+
 .page-hero__copy {
   margin-top: 74px;
 }
@@ -751,6 +838,17 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 16px 28px;
+}
+
+.contact-form-panel--offline {
+  border: 0;
+  padding: 26px 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.contact-email-cta {
+  width: fit-content;
 }
 
 .form-config-note--top {
@@ -943,8 +1041,8 @@ textarea {
   }
 
   .brand-mark {
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
   }
 
   .primary-navigation {
@@ -1161,6 +1259,18 @@ textarea {
 
   .page-hero {
     padding-block: 19px 67px;
+  }
+
+  .page-hero--visual {
+    min-height: 500px;
+  }
+
+  .page-hero--visual .page-hero__media img {
+    object-position: 67% center;
+  }
+
+  .page-hero--visual .page-hero__veil {
+    background: linear-gradient(90deg, rgba(7, 30, 35, 0.94), rgba(7, 30, 35, 0.75));
   }
 
   .page-hero__copy {

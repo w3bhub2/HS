@@ -22,13 +22,15 @@ GitHub Actions builds and deploys the site on pushes to `main` using `.github/wo
 `node scripts/browser-audit.mjs` uses Playwright and axe-core against a local server serving `dist` from `/HS/`; it is a local QA step, not a substitute for real-device or production tests.
 `node scripts/form-mock-audit.mjs` starts a temporary development server with a dummy key and exercises success, error, honeypot, phone normalization, and analytics paths using mocked API responses. It does not send an email.
 
+To run the same browser gate as CI, start `VITE_BASE_PATH=/HS/ node scripts/preview-pages.mjs` in one terminal, then run `HEALSPOC_PREVIEW_URL=http://127.0.0.1:8080/HS/ node scripts/browser-audit.mjs` in another. The GitHub Pages workflow now runs this audit and the mocked form audit before publishing a new commit.
+
 ## Contact and form setup
 
 - The approved WhatsApp destination is `+91 9108027762` (`https://wa.me/919108027762`). All prefilled messages open a conversation for a person to handle.
 - The official email is `hello@healspoc.com`.
 - The Web3Forms recipient is configured by the access key, not by a hidden `recipient` form field. Create the key for `hello@healspoc.com`, restrict allowed domains to `w3bhub2.github.io` (and any approved future domain), and add it as the repository Actions secret `WEB3FORMS_ACCESS_KEY`.
 - Copy `.env.example` to `.env.local` for local configuration. A Web3Forms browser access key is designed for client-side use and is visible in the built JavaScript; do not put an account password or private server credential in a `VITE_` variable.
-- Without an access key the form explicitly reports that delivery is not configured and offers WhatsApp/email fallbacks. A real Web3Forms inbox-delivery test requires owner access and has not been completed.
+- Without an access key the form is not shown, so visitors cannot waste time submitting an undeliverable enquiry. WhatsApp and email remain available. A real Web3Forms inbox-delivery test requires owner access and has not been completed.
 - The form intentionally excludes medical records, scans, diagnoses, and other sensitive health data.
 
 ## Analytics
@@ -45,4 +47,6 @@ Legal pages are drafts because the legal entity, registered address, governing j
 
 The separate public site `healspoc.com` was observed as a WordPress/PHP site on Hostinger infrastructure. Publishing this GitHub Pages site does not replace it or prove it secure. Do not change the existing production domain until a recoverable backup, WordPress security investigation, URL migration review, and rollback plan are complete. See `docs/audit-findings.md` and `docs/deployment-checklist.md`.
 
-Image sources and licensing notes are recorded in `docs/image-sources.md`.
+Image sources and licensing notes, including Pinterest visual research and the original Pexels listings for every treatment image, are recorded in `docs/image-sources.md`. Pinterest images were not copied without independent usage rights.
+
+See `docs/launch-readiness.md` for the exact checks still requiring owner access or approval before treating the project as a fully verified healthcare production site.

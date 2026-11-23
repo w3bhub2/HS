@@ -4,11 +4,18 @@ export type SourceLink = {
   note: string;
 };
 
+export type PageVisual = {
+  file: string;
+  alt: string;
+  caption: string;
+};
+
 export type TreatmentArea = {
   slug: string;
   label: string;
   shortLabel: string;
   summary: string;
+  visual: PageVisual;
 };
 
 export const SITE_URL = (import.meta.env.VITE_SITE_URL || "https://healspoc.com").replace(/\/+$/, "");
@@ -36,6 +43,11 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Cancer",
     summary:
       "A broad enquiry category for people asking about cancer-related care and possible provider options in India.",
+    visual: {
+      file: "treatments/cancer-care",
+      alt: "Clinicians reviewing medical imaging together during a diagnostic discussion",
+      caption: "Illustrative diagnostic-imaging photograph. No HealSpoc clinician or patient is shown.",
+    },
   },
   {
     slug: "cardiac-care",
@@ -43,6 +55,11 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Cardiac",
     summary:
       "A broad enquiry category for questions about heart-related care and how to confirm current provider information.",
+    visual: {
+      file: "treatments/cardiac-care",
+      alt: "A clinician discussing an electrocardiogram displayed on a monitor",
+      caption: "Illustrative electrocardiogram discussion. No HealSpoc clinician or patient is shown.",
+    },
   },
   {
     slug: "brain-spine",
@@ -50,6 +67,11 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Brain and spine",
     summary:
       "A broad enquiry category for questions about brain, nerve, and spine-related care options.",
+    visual: {
+      file: "treatments/brain-spine",
+      alt: "A sequence of spinal radiology images displayed for clinical review",
+      caption: "Illustrative spinal imaging. This is not a patient record supplied to HealSpoc.",
+    },
   },
   {
     slug: "orthopaedics",
@@ -57,6 +79,11 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Orthopaedics",
     summary:
       "A broad enquiry category for questions about bone, joint, and musculoskeletal care.",
+    visual: {
+      file: "treatments/orthopaedics",
+      alt: "A healthcare professional assessing an arm joint during an examination",
+      caption: "Illustrative joint examination. No HealSpoc clinician or patient is shown.",
+    },
   },
   {
     slug: "weight-loss",
@@ -64,6 +91,11 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Weight and bariatric",
     summary:
       "A broad enquiry category for people exploring clinician-led assessment and care related to weight management.",
+    visual: {
+      file: "treatments/weight-loss",
+      alt: "People discussing a nutrition chart at a table",
+      caption: "Illustrative nutrition discussion, not a bariatric treatment or patient outcome.",
+    },
   },
   {
     slug: "endocrine-care",
@@ -71,6 +103,11 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Endocrine",
     summary:
       "A broad enquiry category for questions about hormone and endocrine-related care.",
+    visual: {
+      file: "treatments/endocrine-care",
+      alt: "A healthcare professional examining a patient's neck in a clinic",
+      caption: "Illustrative neck examination, one possible clinical context for endocrine questions.",
+    },
   },
   {
     slug: "eye-care",
@@ -78,6 +115,11 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Eye care",
     summary:
       "A broad enquiry category for questions about eye health and possible provider options.",
+    visual: {
+      file: "treatments/eye-care",
+      alt: "An optometrist fitting a trial frame during an eye examination",
+      caption: "Illustrative vision examination. No HealSpoc clinician or patient is shown.",
+    },
   },
   {
     slug: "dental-care",
@@ -85,6 +127,11 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Dental",
     summary:
       "A broad enquiry category for questions about dental care and provider information.",
+    visual: {
+      file: "treatments/dental-care",
+      alt: "A dental professional demonstrating a model of human teeth",
+      caption: "Illustrative dental model, not evidence of a HealSpoc dental provider.",
+    },
   },
   {
     slug: "womens-health",
@@ -92,8 +139,19 @@ export const treatmentAreas: TreatmentArea[] = [
     shortLabel: "Women's health",
     summary:
       "A broad enquiry category for questions about women's health and related provider options.",
+    visual: {
+      file: "treatments/womens-health",
+      alt: "A woman speaking with a healthcare professional during a consultation",
+      caption: "Illustrative healthcare conversation. No HealSpoc clinician or patient is shown.",
+    },
   },
 ];
+
+export const medicalTravelVisual: PageVisual = {
+  file: "treatments/medical-travel",
+  alt: "A traveller moving through an airport corridor with luggage",
+  caption: "Illustrative travel photograph; it does not depict a HealSpoc journey or location.",
+};
 
 export const publicSources: SourceLink[] = [
   {

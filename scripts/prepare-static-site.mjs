@@ -84,13 +84,14 @@ function setCanonical(html, path, isKnownPage) {
     : html.replace("</head>", `${tag}\n</head>`);
 }
 
-function applyMetadata(html, path, metadata, isKnownPage) {
+function applyMetadata(html, path, metadata, isKnownPage, visual) {
   let output = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeAttribute(metadata.title)}</title>`);
   output = setMeta(output, "name", "description", metadata.description);
   output = setMeta(output, "property", "og:title", metadata.title);
   output = setMeta(output, "property", "og:description", metadata.description);
   output = setMeta(output, "property", "og:url", `${origin}${path}`);
-  output = setMeta(output, "property", "og:image", `${origin}/images/hero-care.jpg`);
+  const imagePath = visual ? `images/${visual.file}` : "images/hero-care";
+  output = setMeta(output, "property", "og:image", `${origin}/${imagePath}.jpg`);
   output = setCanonical(output, path, isKnownPage);
 
   const robotsPattern = /<meta\b(?=[^>]*\bname=["']robots["'])[^>]*\/?\s*>/i;
@@ -101,10 +102,10 @@ function applyMetadata(html, path, metadata, isKnownPage) {
   }
 
   const preloadPattern = /<link\b(?=[^>]*\brel=["']preload["'])(?=[^>]*\bas=["']image["'])[^>]*\/?\s*>/i;
-  output = path === "/"
+  output = path === "/" || visual
     ? output.replace(
       preloadPattern,
-      `<link rel="preload" as="image" href="${basePath}images/hero-care.webp" type="image/webp" fetchpriority="high" />`,
+      `<link rel="preload" as="image" href="${basePath}${imagePath}.webp" type="image/webp" fetchpriority="high" />`,
     )
     : output.replace(preloadPattern, "");
 
@@ -171,7 +172,10 @@ const vite = await createServer({
 });
 
 try {
-  const [{ default: App, getMetadata, isKnownPath }, { SITE_URL }] = await Promise.all([
+  const [
+    { default: App, getMetadata, isKnownPath },
+    { SITE_URL, treatmentAreas, medicalTravelVisual },
+  ] = await Promise.all([
     vite.ssrLoadModule("/src/App.tsx"),
     vite.ssrLoadModule("/src/content.ts"),
   ]);
@@ -180,11 +184,15 @@ try {
     globalThis.__HEALSPOC_SSR_PATH__ = route;
     const markup = renderToString(createElement(App));
     const metadata = getMetadata(route);
+    const visual = route === "/medical-travel-to-india/"
+      ? medicalTravelVisual
+      : treatmentAreas.find((area) => route === `/treatments/${area.slug}/`)?.visual;
     const html = applyMetadata(
       applyServerMarkup(htmlTemplate, markup),
       route,
       metadata,
       isKnownPath(route),
+      visual,
     );
     const target = route === "/"
       ? resolve(dist, "index.html")

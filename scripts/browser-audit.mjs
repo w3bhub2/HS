@@ -13,6 +13,7 @@ const routes = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => {
     : url.pathname.replace(/^\//, "");
 });
 const screens = [
+  { name: "small-mobile", width: 320, height: 690 },
   { name: "mobile", width: 390, height: 844 },
   { name: "tablet", width: 768, height: 1024 },
   { name: "desktop", width: 1440, height: 900 },
@@ -63,6 +64,13 @@ try {
           );
           if (!heroImage) problems.push(`${label}: hero image did not load.`);
         }
+        if ((route.startsWith("treatments/") && route !== "treatments/") ||
+            route === "medical-travel-to-india/") {
+          const topicImage = await page.locator(".page-hero__media img").evaluate(
+            (element) => element.naturalWidth,
+          );
+          if (!topicImage) problems.push(`${label}: topic-specific image did not load.`);
+        }
 
         if (pageErrors.length) {
           problems.push(`${label}: ${pageErrors.slice(0, 3).join(" | ")}`);
@@ -102,6 +110,10 @@ try {
   await page.getByRole("button", { name: "Close navigation" }).click();
 
   const mobileWidget = page.getByRole("button", { name: "Open WhatsApp enquiry options" });
+  const whatsAppGlyph = await mobileWidget.locator(".whatsapp-logo path").getAttribute("d");
+  if (!whatsAppGlyph?.startsWith("M17.472 14.382")) {
+    problems.push("The floating control does not use the complete WhatsApp logo.");
+  }
   await mobileWidget.click();
   const panel = page.getByRole("region", { name: "WhatsApp enquiry options" });
   if (!(await panel.isVisible())) problems.push("Mobile WhatsApp panel did not open.");
@@ -123,37 +135,53 @@ try {
   }
   await page.close();
 
+  const navigationPage = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    reducedMotion: "reduce",
+  });
+  await navigationPage.goto(new URL("treatments/", base).href, { waitUntil: "networkidle" });
+  await navigationPage.locator(".treatment-directory a").first().click();
+  await navigationPage.waitForURL(/\/treatments\/cancer-care\/$/);
+  if (!(await navigationPage.locator(".page-hero__media img").evaluate((element) => element.naturalWidth))) {
+    problems.push("Client navigation did not load the cancer-care image.");
+  }
+  const currentOgImage = await navigationPage.locator('meta[property="og:image"]').getAttribute("content");
+  if (!currentOgImage?.endsWith("/images/treatments/cancer-care.jpg")) {
+    problems.push("Client navigation did not update the treatment-specific Open Graph image.");
+  }
+  await navigationPage.goBack();
+  if (!(await navigationPage.getByRole("heading", { level: 1, name: "Explore treatment areas" }).isVisible())) {
+    problems.push("Back navigation did not return to the treatment directory.");
+  }
+  await navigationPage.close();
+
   const contact = await browser.newPage({
     viewport: { width: 390, height: 844 },
     reducedMotion: "reduce",
   });
   await contact.goto(new URL("contact/", base).href, { waitUntil: "networkidle" });
-  await contact.evaluate(() => {
-    window.__healspocTestEvents = [];
-    window.addEventListener("healspoc:analytics", (event) => {
-      window.__healspocTestEvents.push(event.detail);
+  if (await contact.locator("form.enquiry-form").count()) {
+    await contact.evaluate(() => {
+      window.__healspocTestEvents = [];
+      window.addEventListener("healspoc:analytics", (event) => {
+        window.__healspocTestEvents.push(event.detail);
+      });
     });
-  });
-  await contact.getByRole("button", { name: "Send enquiry" }).click();
-  if (!(await contact.locator(".form-status").innerText()).includes("required fields")) {
-    problems.push("The empty contact form did not show a validation error.");
-  }
-  await contact.getByLabel("Full name").fill("A Test Person");
-  await contact.getByLabel("Country", { exact: true }).fill("United Kingdom");
-  await contact.getByLabel("WhatsApp number with country code").fill("+44 7700 900000");
-  await contact.getByLabel("Treatment of interest").selectOption("Cancer care");
-  await contact.getByLabel("Brief enquiry").fill("Please share current information about my enquiry.");
-  await contact.getByLabel(/I agree that my enquiry details/).check();
-  await contact.getByRole("button", { name: "Send enquiry" }).click();
-  if (!(await contact.locator(".form-status").innerText()).includes("not configured yet")) {
-    problems.push("The unconfigured Web3Forms state was not disclosed after submission.");
-  }
-  const formEvents = await contact.evaluate(() => window.__healspocTestEvents);
-  if (!formEvents.some((event) => event.event === "contact_form_start")) {
-    problems.push("Contact form start event was not emitted.");
-  }
-  if (!formEvents.some((event) => event.event === "contact_form_error")) {
-    problems.push("Contact form error event was not emitted.");
+    await contact.getByRole("button", { name: "Send enquiry" }).click();
+    if (!(await contact.locator(".form-status").innerText()).includes("required fields")) {
+      problems.push("The configured form did not validate empty required fields.");
+    }
+    const formEvents = await contact.evaluate(() => window.__healspocTestEvents);
+    if (!formEvents.some((event) => event.event === "contact_form_error")) {
+      problems.push("Configured form validation did not emit an error event.");
+    }
+  } else {
+    if (!(await contact.getByText("The web enquiry form is not active yet.", { exact: false }).isVisible())) {
+      problems.push("The unavailable web form was not disclosed on the contact page.");
+    }
+    if ((await contact.locator(".contact-email-cta").getAttribute("href")) !== "mailto:hello@healspoc.com") {
+      problems.push("The offline enquiry fallback does not use the official email.");
+    }
   }
   await contact.close();
 
@@ -181,6 +209,6 @@ if (problems.length) {
   problems.forEach((problem) => console.error(`- ${problem}`));
   process.exitCode = 1;
 } else {
-  console.log(`Browser audit passed: ${pagesChecked} route/screen combinations, mobile menu, WhatsApp messaging/events, offline form states, and four automated WCAG scans.`);
+  console.log(`Browser audit passed: ${pagesChecked} route/screen combinations, topic images/metadata, client navigation, mobile menu, WhatsApp logo/messages/events, contact fallback or validation, and four automated WCAG scans.`);
   console.log("Real iOS/Android devices, Web3Forms inbox delivery, and live WhatsApp app handoff still require separate verification.");
 }

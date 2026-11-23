@@ -46,6 +46,22 @@ jobs:
         env:
           VITE_BASE_PATH: /HS/
           VITE_SITE_URL: https://w3bhub2.github.io/HS
+      - name: Install browser for acceptance checks
+        run: npx playwright install --with-deps chromium
+      - name: Audit pages and interactions before publishing
+        run: |
+          node scripts/preview-pages.mjs > /tmp/healspoc-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:8080/HS/ > /dev/null; then break; fi
+            sleep 1
+          done
+          HEALSPOC_PREVIEW_URL=http://127.0.0.1:8080/HS/ node scripts/browser-audit.mjs
+        env:
+          VITE_BASE_PATH: /HS/
+      - name: Audit form states with mocked API responses
+        run: node scripts/form-mock-audit.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
