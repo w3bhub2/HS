@@ -19,7 +19,14 @@ const mime = {
 };
 
 createServer(async (request, response) => {
-  const pathname = decodeURIComponent(new URL(request.url || "/", "http://localhost").pathname);
+  let pathname;
+  try {
+    pathname = decodeURIComponent(new URL(request.url || "/", "http://localhost").pathname);
+  } catch {
+    response.writeHead(400);
+    response.end();
+    return;
+  }
   if (!pathname.startsWith(basePath)) {
     response.writeHead(404);
     response.end();
